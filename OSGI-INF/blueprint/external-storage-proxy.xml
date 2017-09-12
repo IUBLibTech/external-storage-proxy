@@ -29,12 +29,18 @@
     <transform>
       <constant>Hello World</constant>
     </transform>
+    <setHeader headerName="Exchange.CONTENT_TYPE">
+      <constant>text/plain</constant>
+    </setHeader>
   </route>
   <route>
     <from uri="direct:bye"/>
     <transform>
       <constant>Bye World</constant>
     </transform>
+    <setHeader headerName="Exchange.CONTENT_TYPE">
+      <constant>text/plain</constant>
+    </setHeader>
   </route>
 </camelContext>
 </blueprint>
