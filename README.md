@@ -8,7 +8,7 @@
   - `feature:repo-add camel 2.19.2`
   - `feature:install camel-blueprint`
   - `feature:install camel-jetty`
-  - `feature:install camel-jackson
+  - `feature:install camel-jackson`
   - `feature:install camel-http4`
   - `feature:install camel-mustache`
 - Clone or copy this repo into the Karaf deploy directory
