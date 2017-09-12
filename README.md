@@ -9,6 +9,6 @@
   - `feature:install camel-blueprint`
   - `feature:install camel-jetty`
   - `feature:install camel-script-jruby`
-  - 'feature:install camel-mustache'
+  - `feature:install camel-mustache`
 - Clone or copy this repo into the Karaf deploy directory
 - `log:tail` and `camel:route-list` to check for successful deployment
