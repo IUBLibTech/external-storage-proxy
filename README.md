@@ -3,6 +3,7 @@
 ### Installation
 
 - Download and extract Apache Karaf Container 4.1+
+  - http://karaf.apache.org/
 - Start Karaf `bin/karaf`
 - Install camel features (update repo version if needed)
   - `feature:repo-add camel 2.19.2`
