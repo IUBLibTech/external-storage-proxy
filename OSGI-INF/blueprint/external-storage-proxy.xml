@@ -10,7 +10,7 @@
             http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
             ">
 <camelContext xmlns="http://camel.apache.org/schema/blueprint">
-  <restConfiguration component="spark-rest" port="9091"> 
+  <restConfiguration component="jetty" port="9091"> 
     <componentProperty key="foo" value="123"/>
   </restConfiguration>
   <rest path="/say">
