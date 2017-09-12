@@ -1,49 +1,51 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xmlns:camel="http://camel.apache.org/schema/blueprint"
-     xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
-     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-     xsi:schemaLocation="
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:camel="http://camel.apache.org/schema/blueprint"
+           xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xsi:schemaLocation="
             http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
             http://camel.apache.org/schema/blueprint
             http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
             ">
-<camelContext xmlns="http://camel.apache.org/schema/blueprint">
-  <restConfiguration component="jetty" port="9091"> 
-    <componentProperty key="foo" value="123"/>
-  </restConfiguration>
-  <rest path="/say">
-    <get uri="/hello">
-      <to uri="direct:hello"/>
-    </get>
-    <get uri="/bye" consumes="application/json">
-      <to uri="direct:bye"/>
-    </get>
-    <post uri="/bye">
-      <to uri="mock:update"/>
-    </post>
-  </rest>
-  <route>
-    <from uri="direct:hello"/>
-    <transform>
-      <constant>Hello World</constant>
-    </transform>
-    <setHeader headerName="Exchange.CONTENT_TYPE">
-      <constant>text/plain</constant>
-    </setHeader>
-    <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
-      <constant>200</constant>
-    </setHeader>
-  </route>
-  <route>
-    <from uri="direct:bye"/>
-    <transform>
-      <constant>Bye World</constant>
-    </transform>
-    <setHeader headerName="Exchange.CONTENT_TYPE">
-      <constant>text/plain</constant>
-    </setHeader>
-  </route>
-</camelContext>
+  <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+    <restConfiguration component="jetty" port="9091">
+      <componentProperty key="foo" value="123"/>
+    </restConfiguration>
+
+    <rest path="/">
+      <get uri="/status/{external_url}" produces="text/json">
+        <to uri="direct:status"/>
+      </get>
+      <post uri="/stage/{external_url}" produces="text/json">
+        <to uri="direct:stage"/>
+      </post>
+    </rest>
+
+    <route>
+      <from uri="direct:status"/>
+      <transform>
+        <constant>Hello World</constant>
+      </transform>
+      <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+        <constant>200</constant>
+      </setHeader>
+      <to uri="direct:log"/>
+    </route>
+
+    <route>
+      <from uri="direct:stage"/>
+      <transform>
+        <constant>Bye World</constant>
+      </transform>
+    </route>
+
+    <route>
+      <from uri="direct:log" />
+      <log message="Headers: ${headers}"/>
+      <log message="Body: ${body}"/>
+    </route>
+
+  </camelContext>
 </blueprint>
