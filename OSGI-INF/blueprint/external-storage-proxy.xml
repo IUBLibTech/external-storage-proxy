@@ -47,5 +47,13 @@
       <log message="Body: ${body}"/>
     </route>
 
-  </camelContext>
+    <route>
+      <from uri="direct:eventQuery"/>
+      <setBody>
+        <constant>SELECT * FROM EVENTS WHERE EXTERNAL_URI = ${headers.external_url}</constant>
+      </setBody>
+      <to uri="jdbc:CacheMgrDB"/>
+      <to uri="mock:result"/>
+    </route>
+</camelContext>
 </blueprint>
