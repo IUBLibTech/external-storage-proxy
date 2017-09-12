@@ -25,13 +25,11 @@
 
     <route>
       <from uri="direct:status"/>
-      <transform>
-        <constant>Hello World</constant>
-      </transform>
       <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
         <constant>200</constant>
       </setHeader>
       <to uri="direct:log"/>
+      <to uri="mustache:status.tmpl"/>
     </route>
 
     <route>
