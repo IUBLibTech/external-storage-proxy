@@ -15,23 +15,21 @@
     </restConfiguration>
 
     <rest path="/">
-      <get uri="/status/{external_url}" produces="text/json">
+      <get uri="/status/{external_url}" produces="application/json">
         <to uri="direct:status"/>
       </get>
-      <post uri="/stage/{external_url}" produces="text/json">
+      <post uri="/stage/{external_url}" produces="application/json">
         <to uri="direct:stage"/>
       </post>
     </rest>
 
     <route>
       <from uri="direct:status"/>
-      <transform>
-        <constant>Hello World</constant>
-      </transform>
       <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
         <constant>200</constant>
       </setHeader>
       <to uri="direct:log"/>
+      <to uri="mustache:status.tmpl"/>
     </route>
 
     <route>

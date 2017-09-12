@@ -10,5 +10,6 @@
   - `feature:install camel-jetty`
   - `feature:install camel-jackson
   - `feature:install camel-http4`
+  - `feature:install camel-mustache`
 - Clone or copy this repo into the Karaf deploy directory
 - `log:tail` and `camel:route-list` to check for successful deployment
