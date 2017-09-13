@@ -9,6 +9,12 @@
             http://camel.apache.org/schema/blueprint
             http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
             ">
+  <cm:property-placeholder id="external_proxy.config" persistent-id="camel.blueprint">
+    <cm:default-properties>
+      <cm:property name="s3_url" value="http://localhost:8080"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
     <restConfiguration component="jetty" port="9091">
       <componentProperty key="foo" value="123"/>
@@ -25,6 +31,13 @@
 
     <route>
       <from uri="direct:status"/>
+      <choice>
+        <when>
+          <simple>${headers.service} == 's3'</simple>
+          <to uri="direct:status_s3"/>
+        </when>
+      </choice>
+
       <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
         <constant>200</constant>
       </setHeader>
@@ -37,6 +50,14 @@
       <transform>
         <constant>Bye World</constant>
       </transform>
+    </route>
+
+    <route>
+      <from uri="direct:status_s3"/>
+      <setHeader headerName="Exchange.HTTP_URI">
+        <simple>{{s3_url}}/${headers.external_url}/status</simple>
+      </setHeader>
+      <to uri="http4://fakehost/"/>
     </route>
 
     <route>
