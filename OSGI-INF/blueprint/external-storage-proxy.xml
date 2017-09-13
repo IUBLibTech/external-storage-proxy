@@ -34,9 +34,10 @@
 
     <route>
       <from uri="direct:stage"/>
-      <transform>
-        <constant>Bye World</constant>
-      </transform>
+      <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+        <constant>200</constant>
+      </setHeader>
+      <to uri="mustache:stage.tmpl"/>
     </route>
 
     <route>
