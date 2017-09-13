@@ -15,10 +15,10 @@
     </restConfiguration>
 
     <rest path="/">
-      <get uri="/status/?{external_url}" produces="application/json">
+      <get uri="/status/?{external_uri}" produces="application/json">
         <to uri="direct:status"/>
       </get>
-      <post uri="/stage/?{external_url}" produces="application/json">
+      <post uri="/stage/?{external_uri}" produces="application/json">
         <to uri="direct:stage"/>
       </post>
     </rest>
