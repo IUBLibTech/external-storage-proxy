@@ -1,9 +1,7 @@
 {
  "external_uri": "{{headers.external_uri}}",
  "staged": "1",
- {{#headers.location}}
- "staged_location": "{{.}}",
- {{/headers.location}}
+ "staged_location": "s3://examplebucket/image.tif",
  "service": "{{headers.service}}",
  "events": [
     {
