@@ -62,8 +62,8 @@
 
     <route id="select-job">
       <from uri="direct:select-job"/>
-      <to uri="sql:SELECT * FROM jobs;"/>
-      <log message="Select job"/>
+      <to uri="sql:SELECT * FROM jobs?outputHeader=job"/>
+      <log message="Select job: ${headers.job}"/>
     </route>
 
   </camelContext>
