@@ -1,9 +1,9 @@
 ## Versions
 
-Apache Maven 3.3.9
-Karaf 4.1.2
-Camel 2.19.2
-MySQL 14.14
+- Apache Maven 3.3.9
+- Karaf 4.1.2
+- Camel 2.19.2
+- MySQL 14.14
 
 ## Setup
 
