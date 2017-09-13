@@ -52,6 +52,7 @@
     <transform>
       <constant>Bye World</constant>
     </transform>
+    <to uri="direct:select-job"/>
   </route>
 
   <!-- route that generate new orders and insert them in the database -->
@@ -59,6 +60,12 @@
     <from uri="direct:new-job"/>
     <to uri="sql:INSERT INTO jobs (EXTERNAL_URI, FEDORA_URI, SERVICE, STAGED) VALUES ('1234uuidabc', '123ab45cd', 's3', 0);"/>
     <log message="Created new job"/>
+  </route>
+
+  <route id="select-job">
+    <from uri="direct:select-job"/>
+    <to uri="sql:SELECT * FROM jobs;"/>
+    <log message="Select job"/>
   </route>
 
 </camelContext>
