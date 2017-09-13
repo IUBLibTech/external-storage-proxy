@@ -9,36 +9,43 @@
             http://camel.apache.org/schema/blueprint
             http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
             ">
+
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/external_storage_proxy"/>
+    <property name="username" value="****"/>
+    <property name="password" value="****"/>
+  </bean>
+
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
     <restConfiguration component="jetty" port="9091">
       <componentProperty key="foo" value="123"/>
     </restConfiguration>
 
     <rest path="/">
-      <get uri="/status/{external_url}" produces="text/json">
+      <get uri="/status/?{external_uri}" produces="application/json">
         <to uri="direct:status"/>
       </get>
-      <post uri="/stage/{external_url}" produces="text/json">
+      <post uri="/stage/?{external_uri}" produces="application/json">
         <to uri="direct:stage"/>
       </post>
     </rest>
 
     <route>
       <from uri="direct:status"/>
-      <transform>
-        <constant>Hello World</constant>
-      </transform>
       <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
         <constant>200</constant>
       </setHeader>
       <to uri="direct:log"/>
+      <to uri="mustache:status.tmpl"/>
     </route>
 
     <route>
       <from uri="direct:stage"/>
-      <transform>
-        <constant>Bye World</constant>
-      </transform>
+      <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
+        <constant>200</constant>
+      </setHeader>
+      <to uri="mustache:stage.tmpl"/>
     </route>
 
     <route>
@@ -47,13 +54,17 @@
       <log message="Body: ${body}"/>
     </route>
 
-    <route>
-      <from uri="direct:eventQuery"/>
-      <setBody>
-        <constant>SELECT * FROM EVENTS WHERE EXTERNAL_URI = ${headers.external_url}</constant>
-      </setBody>
-      <to uri="jdbc:CacheMgrDB"/>
-      <to uri="mock:result"/>
+    <route id="new-job">
+      <from uri="direct:new-job"/>
+      <to uri="sql:INSERT INTO jobs (EXTERNAL_URI, FEDORA_URI, SERVICE, STAGED) VALUES ('1234uuidabc', '123ab45cd', 's3', 0);"/>
+      <log message="Created new job"/>
     </route>
-</camelContext>
+
+    <route id="select-job">
+      <from uri="direct:select-job"/>
+      <to uri="sql:SELECT * FROM jobs;"/>
+      <log message="Select job"/>
+    </route>
+
+  </camelContext>
 </blueprint>
