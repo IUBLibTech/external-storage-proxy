@@ -12,5 +12,8 @@
   - `feature:install camel-jackson`
   - `feature:install camel-http4`
   - `feature:install camel-mustache`
+  - `feature:install camel-aws`    
 - Clone or copy this repo into the Karaf deploy directory
+- Place configured external_storage.cfg in the Karaf etc directory.
+  - May need to restart Karaf for a new .cfg to be detected.  
 - `log:tail` and `camel:route-list` to check for successful deployment

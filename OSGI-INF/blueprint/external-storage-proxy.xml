@@ -9,11 +9,7 @@
             http://camel.apache.org/schema/blueprint
             http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
             ">
-  <cm:property-placeholder id="external_proxy.config" persistent-id="camel.blueprint">
-    <cm:default-properties>
-      <cm:property name="s3_url" value="http://localhost:8080"/>
-    </cm:default-properties>
-  </cm:property-placeholder>
+  <cm:property-placeholder id="external_storage_config" persistent-id="external_storage" update-strategy="reload"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
     <restConfiguration component="jetty" port="9091">
@@ -36,34 +32,66 @@
           <simple>${headers.service} == 's3'</simple>
           <to uri="direct:status_s3"/>
         </when>
+        <when><simple>${headers.service} == 'file'</simple>
+          <to uri="direct:status_file"/></when>
       </choice>
-
-      <setHeader headerName="Exchange.HTTP_RESPONSE_CODE">
-        <constant>200</constant>
-      </setHeader>
       <to uri="direct:log"/>
       <to uri="mustache:status.tmpl"/>
     </route>
 
     <route>
       <from uri="direct:stage"/>
-      <transform>
-        <constant>Bye World</constant>
-      </transform>
+      <choice>
+        <when>
+          <simple>${headers.service} == 's3'</simple>
+          <to uri="direct:stage_s3"/>
+        </when>
+      </choice>
+      <to uri="direct:log"/>
     </route>
 
     <route>
       <from uri="direct:status_s3"/>
-      <setHeader headerName="Exchange.HTTP_URI">
-        <simple>{{s3_url}}/${headers.external_url}/status</simple>
-      </setHeader>
-      <to uri="http4://fakehost/"/>
+      <pollEnrich timeout="10000" aggregateOnException="true">
+        <simple>aws-s3:{{s3_bucket}}?fileName=${header.external_uri}&amp;includeBody=false&amp;synchronous=false&amp;deleteAfterRead=false&amp;accessKey={{s3_access_key}}&amp;secretKey={{s3_secret_key}}</simple>
+      </pollEnrich>
+      <log message="Last Modified: ${headers.CamelAwsS3LastModified}"/>
+    </route>
+
+    <route>
+      <from uri="direct:stage_s3"/>
+      <pollEnrich timeout="10000" aggregateOnException="true">
+        <simple>aws-s3:{{s3_bucket}}?fileName=${header.external_uri}&amp;synchronous=false&amp;deleteAfterRead=false&amp;accessKey={{s3_access_key}}&amp;secretKey={{s3_secret_key}}</simple>
+      </pollEnrich>
+      <log message="Last Modified: ${headers.CamelAwsS3LastModified}"/>
+      <to uri="direct:write_file_cache"/>
+    </route>
+
+    <route>
+      <from uri="direct:status_file"/>
+      <to uri="direct:read_file_cache"/>
+    </route>
+
+    <route>
+      <from uri="direct:read_file_cache"/>
+      <!--<setHeader headerName="CamelFileName"><simple>${cache_dir}/${header.external_uri}</simple></setHeader>-->
+      <pollEnrich timeout="0">
+        <simple>file:{{cache_dir}}/${header.external_uri}</simple>
+      </pollEnrich>
+    </route>
+
+    <route>
+      <from uri="direct:write_file_cache"/>
+      <!--<setHeader headerName="CamelFileName"><simple>${header.external_uri}</simple></setHeader>-->
+      <enrich>
+        <simple>file:{{cache_dir}}/${header.external_uri}</simple>
+      </enrich>
     </route>
 
     <route>
       <from uri="direct:log" />
       <log message="Headers: ${headers}"/>
-      <log message="Body: ${body}"/>
+      <!--<log message="Body: ${body}"/>-->
     </route>
 
   </camelContext>
