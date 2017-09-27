@@ -1,2 +1,7 @@
 .idea
 etc/external_storage.cfg
+/target/
+/build/
+.classpath
+.project
+/.settings/
