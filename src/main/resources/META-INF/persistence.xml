@@ -6,7 +6,7 @@
 
 	<persistence-unit name="application" transaction-type="RESOURCE_LOCAL">
 
-        <class>org.fcrepo.camel.external.storage.model.Jobs</class>
+        <class>org.fcrepo.camel.external.storage.model.Job</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
 	</persistence-unit>

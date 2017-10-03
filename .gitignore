@@ -5,3 +5,6 @@ etc/external_storage.cfg
 .classpath
 .project
 /.settings/
+
+# Ignore H2 database files
+***.db
