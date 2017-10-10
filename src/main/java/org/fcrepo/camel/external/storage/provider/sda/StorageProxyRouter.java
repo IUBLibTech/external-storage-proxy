@@ -74,7 +74,6 @@ public class StorageProxyRouter extends RouteBuilder {
 		.log("output header...${headers}")
 		.log("output body...:${body}")
 		.process(new RestProcessor())
-		.marshal().json(JsonLibrary.Jackson)
 		.log("output body......${body}");
 
 		from("direct:sdaPostJob")
@@ -104,7 +103,6 @@ public class StorageProxyRouter extends RouteBuilder {
 
 		from("direct:sda_joboutput")
 		.process(new JobProcessor())
-		.marshal().json(JsonLibrary.Jackson)
 		.log("return response...done");
 
 		from("direct:sda_stagenoreturn")

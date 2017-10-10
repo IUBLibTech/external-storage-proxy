@@ -19,7 +19,7 @@
     <!--<package>org.fcrepo.camel.external-storage.provider</package>-->
     <routeBuilder ref="sda_proxy_routes" />
 
-    <restConfiguration component="jetty" port="9091">
+    <restConfiguration component="jetty" bindingMode="json" port="9091">
       <componentProperty key="foo" value="123"/>
     </restConfiguration>
 

@@ -3,11 +3,9 @@ package org.fcrepo.camel.external.storage.provider.sda;
 /**
  *  *cache response template for get cache file information 
  *   */
-import java.lang.*;
-import javax.ws.rs.Produces;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Produces("application/json")
 public class CacheResponse{
 	private String name = null;
 	private String status = null;
