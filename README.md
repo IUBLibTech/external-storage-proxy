@@ -13,6 +13,7 @@
   - `feature:install camel-http4`
   - `feature:install camel-mustache`
   - `feature:install camel-aws`
+  - `feature:install camel-cxf`
 - Clone this git repo somewhere.
 - Generate a JAR with `mvn package`    
 - Copy into the Karaf `deploy` directory:
