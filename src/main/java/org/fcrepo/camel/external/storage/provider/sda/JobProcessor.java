@@ -1,9 +1,12 @@
 package org.fcrepo.camel.external.storage.provider.sda;
+import java.util.HashMap;
+
 /*
 */
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.fcrepo.camel.external.storage.common.CommonResponse;
 
 
 public class JobProcessor implements Processor{
@@ -14,12 +17,27 @@ public class JobProcessor implements Processor{
 		final String contentType = in.getHeader(Exchange.CONTENT_TYPE, "", String.class);
 		final String body = in.getBody(String.class);
 		JobResponse jobResponse = new JobResponse();
+		CommonResponse common = new CommonResponse(); 
 
 		String path = in.getHeader(Exchange.HTTP_URI, String.class);
-		jobResponse.setCacheName(in.getHeader("cacheId", String.class));
-		jobResponse.setFileName(in.getHeader("fileId", String.class));
-		jobResponse.setType(in.getHeader("type", String.class));
-		exchange.getOut().setBody(jobResponse);
+		jobResponse.setCacheName(in.getHeader("service", String.class));
+		jobResponse.setFileName(in.getHeader("external_uri", String.class));
+		jobResponse.setType(in.getHeader("action", String.class));
+		
+                common.setExternal_uri(jobResponse.getFileName());
+                common.setService(jobResponse.getCacheName());
+                if (jobResponse.getType().equals("stage")) {
+                    HashMap<String, String> stage = new HashMap<String, String>();
+                    stage.put("status", "pending");
+                    common.setStage(stage);
+                }
+                else if (jobResponse.getType().equals("fixity")) {
+                    HashMap<String, String> fixity = new HashMap<String, String>();
+                    fixity.put("status", "pending");
+                    common.setFixity(fixity);
+                }
+		
+		exchange.getOut().setBody(common);
 		exchange.getOut().setHeaders(exchange.getIn().getHeaders());
 	}
 }

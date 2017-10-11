@@ -16,11 +16,13 @@
   <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+    
     <!--<package>org.fcrepo.camel.external-storage.provider</package>-->
     <routeBuilder ref="sda_proxy_routes" />
 
     <restConfiguration component="jetty" bindingMode="json" port="9091">
       <componentProperty key="foo" value="123"/>
+      <camel:dataFormatProperty key="prettyPrint" value="true"/>
     </restConfiguration>
 
     <rest path="/">

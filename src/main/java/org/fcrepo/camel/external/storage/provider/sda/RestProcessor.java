@@ -9,10 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.fcrepo.camel.external.storage.common.CommonResponse;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class RestProcessor implements Processor{
 	//@Override	
@@ -29,6 +31,7 @@ public class RestProcessor implements Processor{
 		ManagerFixityInfo fmsg = new ManagerFixityInfo();
 
 		if (body != null && !body.isEmpty()){
+                   CommonResponse common = new CommonResponse(); 
 		   try {
 			ArrayList<String> items = new ArrayList(Arrays.asList(body.split("\\+")));
 
@@ -85,9 +88,26 @@ public class RestProcessor implements Processor{
                                     cacheResponse.setUrl(null);
                         }
 			
-			exchange.getOut().setBody(cacheResponse);
+			
+			HashMap<String, String> stage = new HashMap<String, String>();
+		        HashMap<String, String> fixity = new HashMap<String, String>();
+		        common.setExternal_uri(cacheResponse.getName());
+		        common.setService("sda");
+		        if (cacheResponse.getStatus() != null) {
+		            stage.put("status", cacheResponse.getStatus());
+		            stage.put("result", cacheResponse.getUrl());
+		            common.setStage(stage);
+		        }
+		        if (cacheResponse.getFixityAvailable()) {
+		            fixity.put("status", "success");
+		            fixity.put("result", cacheResponse.getChecksum());
+		            fixity.put("created_at", cacheResponse.getFixityDate());
+		            fixity.put("updated_at", cacheResponse.getFixityDate());
+		            common.setFixity(fixity);
+		        }
+			exchange.getOut().setBody(common);
 			}catch (JsonProcessingException e) {
-				exchange.getOut().setBody(cacheResponse);
+				exchange.getOut().setBody(common);
                         }
 
 
