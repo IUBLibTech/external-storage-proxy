@@ -74,6 +74,7 @@ public class StorageProxyRouter extends RouteBuilder {
 		.log("output header...${headers}")
 		.log("output body...:${body}")
 		.process(new RestProcessor())
+		.process(new ResponseProcessor())
 		.log("output body......${body}");
 
 		from("direct:sdaPostJob")
