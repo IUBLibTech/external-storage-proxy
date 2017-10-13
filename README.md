@@ -12,5 +12,14 @@
   - `feature:install camel-jackson`
   - `feature:install camel-http4`
   - `feature:install camel-mustache`
-- Clone or copy this repo into the Karaf deploy directory
-- `log:tail` and `camel:route-list` to check for successful deployment
+  - `feature:install camel-aws`
+  - `feature:install camel-cxf`
+- Clone this git repo somewhere.
+- Generate a JAR with `mvn package`    
+- Copy into the Karaf `deploy` directory:
+  - `OSGI-INF/blueprint/external-storage-proxy.xml`
+  - The generated .jar from the `target` directory 
+- Place configured `external_storage.cfg` in the Karaf `etc` directory.
+  - May need to restart Karaf for new files to be detected.  
+- `log:tail` and `camel:route-list` to check for successful deployment.
+- `bundle:diag` to troubleshoot missing dependencies.
