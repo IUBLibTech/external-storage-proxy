@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+         http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+  
+  <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.sda.DefaultProcessor"/>
+  <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
+  
+  <camelContext id="SampleCamel" xmlns="http://camel.apache.org/schema/spring">
+    <routeBuilder ref="sda_proxy_routes" />
+
+    <route id="status_header">
+      <from uri="direct:status_header"/>
+      <setHeader headerName="action"><constant>status</constant></setHeader>
+      <toD uri="direct:begin_${header.service}_status"/>
+    </route>
+    
+    <route id="stage_header">
+      <from uri="direct:stage_header"/>
+      <setHeader headerName="action"><constant>stage</constant></setHeader>
+      <toD uri="direct:begin_${header.service}_stage"/>
+    </route>
+
+    <!-- Public API routes -->
+
+    <route id="begin_sda_status">
+      <from uri="direct:begin_sda_status"/>
+      <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
+      <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
+      <to uri="direct:sdaSearchFile"/>
+      <to uri="direct:log_request"/>
+    </route>
+
+    <route id="begin_sda_stage">
+      <from uri="direct:begin_sda_stage"/>
+      <to uri="direct:sdaPostJob"/>
+      <to uri="direct:log_request"/>
+    </route>
+
+    <route id="begin_s3_status">
+      <from uri="direct:begin_s3_status"/>
+      <to uri="direct:log_request"/>
+      <pollEnrich timeout="10000" aggregateOnException="true">
+        <simple>aws-s3:{{s3_bucket}}?fileName=${header.external_uri}&amp;includeBody=false&amp;synchronous=false&amp;deleteAfterRead=false&amp;accessKey={{s3_access_key}}&amp;secretKey={{s3_secret_key}}</simple>
+      </pollEnrich>
+      <log message="Last Modified: ${headers.CamelAwsS3LastModified}"/>
+    </route>
+
+    <route id="begin_s3_stage">
+      <from uri="direct:begin_s3_stage"/>
+      <to uri="direct:log_request"/>
+      <pollEnrich timeout="10000" aggregateOnException="true">
+        <simple>aws-s3:{{s3_bucket}}?fileName=${header.external_uri}&amp;synchronous=false&amp;deleteAfterRead=false&amp;accessKey={{s3_access_key}}&amp;secretKey={{s3_secret_key}}</simple>
+      </pollEnrich>
+      <log message="Last Modified: ${headers.CamelAwsS3LastModified}"/>
+      <to uri="direct:write_file_cache"/>
+    </route>
+
+    <route id="begin_file_status">
+      <from uri="direct:begin_file_status"/>
+      <to uri="direct:log_request"/>
+      <to uri="direct:read_file_cache"/>
+    </route>
+
+    <route id="begin_file_stage">
+      <from uri="direct:begin_file_stage"/>
+      <to uri="direct:log_request"/>
+    </route>
+
+    <!-- Internal routes -->
+
+    <route id="read_file_cache">
+      <from uri="direct:read_file_cache"/>
+      <!--<setHeader headerName="CamelFileName"><simple>${cache_dir}/${header.external_uri}</simple></setHeader>-->
+      <pollEnrich timeout="0">
+        <simple>file:{{cache_dir}}/${header.external_uri}</simple>
+      </pollEnrich>
+    </route>
+
+    <route id="write_file_cache">
+      <from uri="direct:write_file_cache"/>
+      <!--<setHeader headerName="CamelFileName"><simple>${header.external_uri}</simple></setHeader>-->
+      <enrich>
+        <simple>file:{{cache_dir}}/${header.external_uri}</simple>
+      </enrich>
+    </route>
+
+    <route id="log_request">
+      <from uri="direct:log_request" />
+      <log message="Requesting ${header.service} ${header.action} of ${header.external_uri}"/>
+      <log message="Headers: ${headers}"/>
+      <log message="Body: ${body}"/>
+    </route>
+      
+
+
+  </camelContext>
+
+</beans>
