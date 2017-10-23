@@ -22,8 +22,18 @@
   <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.sda.DefaultProcessor"/>
   <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
   
-  <camelContext id="SampleCamel" xmlns="http://camel.apache.org/schema/spring">
+  <camelContext id="ExternalStorageProxy" xmlns="http://camel.apache.org/schema/spring">
     <routeBuilder ref="sda_proxy_routes" />
+    
+    <rest path="/">
+      <get uri="/{service}/status/{external_uri}">
+        <to uri="direct:status_header"/>
+      </get>
+      
+      <post uri="/{service}/stage/{external_uri}">
+        <to uri="direct:stage_header"/>
+      </post>
+    </rest>
 
     <route id="status_header">
       <from uri="direct:status_header"/>
