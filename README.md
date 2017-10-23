@@ -1,25 +1,80 @@
+
 ## External Storage Proxy using Camel
 
-### Installation
+A web service using Camel routes for asynchronous retrieval of large objects from storage services.  Provides a common API and responses for an asynchronous-aware client to prevent long blocking requests and instead provide acceptable user interactions.   
 
-- Download and extract Apache Karaf Container 4.1+
-  - http://karaf.apache.org/
-- Start Karaf `bin/karaf`
-- Install camel features (update repo version if needed)
-  - `feature:repo-add camel 2.19.2`
-  - `feature:install camel-blueprint`
-  - `feature:install camel-jetty`
-  - `feature:install camel-jackson`
-  - `feature:install camel-http4`
-  - `feature:install camel-aws`
-  - `feature:install camel-cxf`
-  - `feature:install hibernate`
-- Clone this git repo somewhere.
-- Generate a JAR with `mvn package`    
-- Copy into the Karaf `deploy` directory:
-  - `OSGI-INF/blueprint/external-storage-proxy.xml`
-  - The generated .jar from the `target` directory 
-- Place configured `external_storage.cfg` in the Karaf `etc` directory.
-  - May need to restart Karaf for new files to be detected.  
-- `log:tail` and `camel:route-list` to check for successful deployment.
-- `bundle:diag` to troubleshoot missing dependencies.
+
+### Prerequisites
+```
+Java 1.8+
+Maven 3.3+
+```
+
+### Installing
+
+Configure `src/main/resources/application.properties` appropriately.
+
+Run via Maven:
+
+```
+mvn package
+mvn spring-boot:run
+```
+
+## Test
+
+Accessing the built-in API docs endpoint at [http://localhost:8080/api-doc](http://localhost:8080/api-doc) should look something like:  
+
+```
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "User API"
+  },
+  "host" : "0.0.0.0",
+  "schemes" : [ "http" ],
+  "paths" : {
+    "//{service}/stage/{external_uri}" : {
+      "post" : {
+        "operationId" : "route2",
+        "parameters" : [ {
+          "name" : "service",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "external_uri",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "x-camelContextId" : "ExternalStorageProxy",
+        "x-routeId" : "route2"
+      }
+    },
+    "//{service}/status/{external_uri}" : {
+      "get" : {
+        "operationId" : "route1",
+        "parameters" : [ {
+          "name" : "service",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "external_uri",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "x-camelContextId" : "ExternalStorageProxy",
+        "x-routeId" : "route1"
+      }
+    }
+  }
+}
+```
