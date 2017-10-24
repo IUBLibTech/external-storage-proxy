@@ -1,0 +1,8 @@
+camel:
+  springboot:
+    name: ExternalStorageProxy
+
+  component:
+    servlet:
+      mapping:
+        contextPath: /external-storage-proxy/*
