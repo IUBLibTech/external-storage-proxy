@@ -3,6 +3,7 @@ package org.fcrepo.camel.external.storage;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.servlet.CamelHttpTransportServlet;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.fcrepo.camel.external.storage.service.DatabaseService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -37,6 +38,11 @@ public class Application {
 	            .apiContextPath("/api-doc")
 	                .apiProperty("api.title", "User API").apiProperty("api.version", "1.0.0")
 	                .apiProperty("cors", "true");
+	            rest("/jobs").description("Jobs REST service")
+	                .get("/").description("The list of all jobs performed on an external object")
+	                    .route().routeId("jobs-api")
+	                    .bean(DatabaseService.class, "findJobs")
+	                    .endRest();
 	        }
 	}
 }

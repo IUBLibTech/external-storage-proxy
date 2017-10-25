@@ -16,11 +16,17 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Ignore
+@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeTests.sql")
+@Sql(executionPhase = ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:afterTests.sql")
+
+// To skip any failing test methods, annotate them with @Ignore 
+
 public class ApplicationTest {
 
     @Autowired
@@ -28,7 +34,7 @@ public class ApplicationTest {
 
     @Test
     public void jobsTest() {
-        ResponseEntity<List<Job>> response = restTemplate.exchange("//external-storage-proxy/jobs",
+        ResponseEntity<List<Job>> response = restTemplate.exchange("/jobs",
             HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
             });
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

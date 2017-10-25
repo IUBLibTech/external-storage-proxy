@@ -7,7 +7,7 @@ A web service using Camel routes for asynchronous retrieval of large objects fro
 ### Prerequisites
 ```
 Java 1.8+
-Maven 3.3+
+Maven 3.0+
 ```
 
 ### Installing

@@ -20,10 +20,6 @@
       <post uri="/{service}/stage/{external_uri}">
         <to uri="direct:stage_header"/>
       </post>
-      
-      <get uri="/jobs">
-        <to uri="direct:log_request"/>
-      </get>
     </rest>
 
     <route id="status_header">

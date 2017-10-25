@@ -6,23 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-
-@NamedQueries(  
-              {  
-                  @NamedQuery(  
-                  name = "findJobsByUri",  
-                  query = "from Job j where j.external_uri = :external_uri"  
-                  ),
-                  @NamedQuery(  
-                  name = "findJobsByType",  
-                  query = "from Job j where j.type = :type"  
-                  )
-              }  
-          )  
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "jobs")
 public class Job {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
