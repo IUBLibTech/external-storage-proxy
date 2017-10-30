@@ -1,0 +1,16 @@
+camel:
+  springboot:
+    name: ExternalStorageProxy
+
+  component:
+    servlet:
+      mapping:
+        contextPath: /*
+spring:
+  # Spring JDBC configuration
+  datasource:
+    url: 'jdbc:h2:mem:jobs;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_UPPER=false;'
+    platform: h2
+  # Spring Data JPA configuration
+  jpa:
+    show-sql: true
