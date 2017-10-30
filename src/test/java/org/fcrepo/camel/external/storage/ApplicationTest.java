@@ -47,4 +47,22 @@ public class ApplicationTest {
             .hasFieldOrPropertyWithValue("external_uri", "myFile")
             .hasFieldOrPropertyWithValue("type","fixity");
     }
+    
+    @Test
+     public void jobQueueProcessorTest() {
+        // Wait for the job_queue_processor route to consume/alter the db rows
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ResponseEntity<List<Job>> response = restTemplate.exchange("/jobs",
+            HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
+            });
+        List<Job> jobs = response.getBody();
+        /* If the Camel JPA route is working, the status of selected rows in the database 
+           will be changed. */
+        assertThat(jobs).element(0)
+            .hasFieldOrPropertyWithValue("status", "queued");
+    }
 }

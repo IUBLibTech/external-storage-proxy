@@ -27,6 +27,11 @@
       </get>
     </rest>
 
+    <route id="job_queue_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay=10000&amp;consumeDelete=false" />
+      <to uri="direct:log_request"/>
+    </route>
+    
     <route id="status_header">
       <from uri="direct:status_header"/>
       <setHeader headerName="action"><constant>status</constant></setHeader>
