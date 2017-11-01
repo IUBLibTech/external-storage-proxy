@@ -46,6 +46,15 @@
     
 
     <!-- Public API routes -->
+    
+    
+    <!-- A dummy post route for test suite -->
+    <route id="begin_dummyService_stage">
+      <from uri="direct:begin_dummyService_stage"/>
+      <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service})"/>
+      <to uri="jpa://org.fcrepo.camel.external.storage.model.Job"/>
+      <to uri="direct:log_request"/>
+    </route>
 
     <route id="begin_sda_status">
       <from uri="direct:begin_sda_status"/>

@@ -14,4 +14,12 @@ public class DatabaseService {
     public Iterable<Job> findJobs() {
         return jobs.findAll();
     }
+    
+    public Job generateJob(String file_uri, String service) {
+        Job job = new Job();
+        job.setExternal_uri(file_uri);
+        job.setService(service);
+        job.setStatus("waiting");
+        return job;
+    }
 }
