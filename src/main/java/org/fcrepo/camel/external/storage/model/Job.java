@@ -6,10 +6,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+import org.apache.camel.component.jpa.Consumed;
 
 @Entity
 @Table(name = "jobs")
+@NamedQuery(name = "readyJobs", query = "select j from Job j where j.status = 'waiting'")
 public class Job {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -22,11 +26,9 @@ public class Job {
     private String status;
     private Date created_at;
     private Date updated_at;
-    private String download_url;
+    private String result;
     private String type;
-    private String checksum;
     private String vendor_msg;
-
     
     public Long getId() {
         return id;
@@ -74,30 +76,31 @@ public class Job {
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
     }
-    public String getDownload_url() {
-        return download_url;
+    public String getResult() {
+        return result;
     }
-    public void setDownload_url(String download_url) {
-        this.download_url = download_url;
+
+    public void setResult(String result) {
+        this.result = result;
     }
+
     public String getType() {
         return type;
     }
     public void setType(String type) {
         this.type = type;
     }
-    public String getChecksum() {
-        return checksum;
-    }
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
+
     public String getVendor_msg() {
         return vendor_msg;
     }
     public void setVendor_msg(String vendor_msg) {
         this.vendor_msg = vendor_msg;
     }
-
-
+    
+    @Consumed
+    public void afterConsume()
+    {
+        setStatus("queued");
+    }
 }

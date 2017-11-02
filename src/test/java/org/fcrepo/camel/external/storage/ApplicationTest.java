@@ -33,7 +33,7 @@ public class ApplicationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void jobsTest() {
+    public void getJobsTest() {
         ResponseEntity<List<Job>> response = restTemplate.exchange("/jobs",
             HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
             });
@@ -46,5 +46,38 @@ public class ApplicationTest {
         assertThat(jobs).element(1)
             .hasFieldOrPropertyWithValue("external_uri", "myFile")
             .hasFieldOrPropertyWithValue("type","fixity");
+    }
+    
+    @Test
+    // @Ignore
+     public void jobQueueProcessorTest() {
+        // Wait for the job_queue_processor route to consume/alter the db rows
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ResponseEntity<List<Job>> response = restTemplate.exchange("/jobs",
+            HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
+            });
+        List<Job> jobs = response.getBody();
+        /* If the Camel JPA route is working, the status of selected rows in the database 
+           will be changed. */
+        assertThat(jobs).element(0)
+            .hasFieldOrPropertyWithValue("status", "queued");
+    }
+    
+    @Test
+    // @Ignore
+    public void postJobTest() {
+        ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
+            HttpMethod.POST, null, String.class);
+        assertThat(stageResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ResponseEntity<List<Job>> response = restTemplate.exchange("/jobs",
+            HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {});
+        List<Job> jobs = response.getBody();
+        assertThat(jobs).hasSize(3);
+        assertThat(jobs).element(2)
+            .hasFieldOrPropertyWithValue("external_uri", "unstagedFile");
     }
 }
