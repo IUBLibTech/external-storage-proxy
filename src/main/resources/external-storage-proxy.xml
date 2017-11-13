@@ -32,6 +32,12 @@
       <to uri="direct:log_request"/>
     </route>
     
+    <route id="fileUriStatus">
+      <from uri="direct:fileUriStatus"/>
+      <to uri="bean:database_service?method=findJobsByFile(${header.external_uri})"/>
+      <to uri="direct:log_request"/>
+    </route>
+    
     <route id="status_header">
       <from uri="direct:status_header"/>
       <setHeader headerName="action"><constant>status</constant></setHeader>
@@ -48,7 +54,15 @@
     <!-- Public API routes -->
     
     
-    <!-- A dummy post route for test suite -->
+    <!-- Dummy routes for test suite -->
+    <route id="begin_dummyService_status">
+      <from uri="direct:begin_dummyService_status"/>
+      <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
+      <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
+      <to uri="direct:fileUriStatus"/>
+      <to uri="direct:log_request"/>
+    </route>
+    
     <route id="begin_dummyService_stage">
       <from uri="direct:begin_dummyService_stage"/>
       <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service})"/>

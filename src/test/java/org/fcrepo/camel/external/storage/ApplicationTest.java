@@ -41,10 +41,10 @@ public class ApplicationTest {
         List<Job> jobs = response.getBody();
         assertThat(jobs).hasSize(2);
         assertThat(jobs).element(0)
-            .hasFieldOrPropertyWithValue("external_uri", "myFile")
+            .hasFieldOrPropertyWithValue("externalUri", "myFile")
             .hasFieldOrPropertyWithValue("type", "stage");
         assertThat(jobs).element(1)
-            .hasFieldOrPropertyWithValue("external_uri", "myFile")
+            .hasFieldOrPropertyWithValue("externalUri", "myFile")
             .hasFieldOrPropertyWithValue("type","fixity");
     }
     
@@ -78,6 +78,19 @@ public class ApplicationTest {
         List<Job> jobs = response.getBody();
         assertThat(jobs).hasSize(3);
         assertThat(jobs).element(2)
-            .hasFieldOrPropertyWithValue("external_uri", "unstagedFile");
+            .hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
+    }
+    
+    @Test
+    //@Ignore
+    public void statusByFileUriTest() {
+        ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
+           HttpMethod.POST, null, String.class);
+        ResponseEntity<List<Job>> response = restTemplate.exchange("/dummyService/status/unstagedFile",
+           HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {});
+        List<Job> jobs = response.getBody();
+        assertThat(jobs).hasSize(1);
+        assertThat(jobs).element(0)
+        .hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
     }
 }
