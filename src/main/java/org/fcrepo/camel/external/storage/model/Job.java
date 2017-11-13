@@ -20,15 +20,15 @@ public class Job {
     private Long id;
 
     private String fname;  // TODO Why do we need this field from whiteboard sketches?
-    private String resource_uri; // The resource uri for fname in a repository like Fedora
-    private String external_uri; // The uri to the fname in the storage service
+    private String resourceUri; // The resource uri for fname in a repository like Fedora
+    private String externalUri; // The uri to the fname in the storage service
     private String service;
     private String status;
-    private Date created_at;
-    private Date updated_at;
+    private Date createdAt;
+    private Date updatedAt;
     private String result;
     private String type;
-    private String vendor_msg;
+    private String vendorMsg;
     
     public Long getId() {
         return id;
@@ -40,17 +40,17 @@ public class Job {
     public void setFname(String fname) {
         this.fname = fname;
     }
-    public String getResource_uri() {
-        return resource_uri;
+    public String getResourceUri() {
+        return resourceUri;
     }
-    public void setResource_uri(String resource_uri) {
-        this.resource_uri = resource_uri;
+    public void setResourceUri(String resourceUri) {
+        this.resourceUri = resourceUri;
     }
-    public String getExternal_uri() {
-        return external_uri;
+    public String getExternalUri() {
+        return externalUri;
     }
-    public void setExternal_uri(String external_uri) {
-        this.external_uri = external_uri;
+    public void setExternalUri(String externalUri) {
+        this.externalUri = externalUri;
     }
     public String getService() {
         return service;
@@ -64,17 +64,17 @@ public class Job {
     public void setStatus(String status) {
         this.status = status;
     }
-    public Date getCreated_at() {
-        return created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
-    public Date getUpdated_at() {
-        return updated_at;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
     public String getResult() {
         return result;
@@ -91,11 +91,11 @@ public class Job {
         this.type = type;
     }
 
-    public String getVendor_msg() {
-        return vendor_msg;
+    public String getVendorMsg() {
+        return vendorMsg;
     }
-    public void setVendor_msg(String vendor_msg) {
-        this.vendor_msg = vendor_msg;
+    public void setVendorMsg(String vendorMsg) {
+        this.vendorMsg = vendorMsg;
     }
     
     @Consumed
