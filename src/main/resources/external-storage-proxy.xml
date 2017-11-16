@@ -18,8 +18,8 @@
         <to uri="direct:status_header"/>
       </get>
       
-      <post uri="/{service}/stage/{external_uri}">
-        <to uri="direct:stage_header"/>
+      <post uri="/{service}/{action}/{external_uri}">
+        <toD uri="direct:${header.action}_header"/>
       </post>
       
       <get uri="/jobs">
@@ -27,8 +27,13 @@
       </get>
     </rest>
 
-    <route id="job_queue_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay=10000&amp;consumeDelete=false" />
+    <route id="job_ready_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <to uri="direct:log_request"/>
+    </route>
+    
+    <route id="job_queued_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;consumer.delay=5000&amp;consumeDelete=false" />
       <to uri="direct:log_request"/>
     </route>
     
@@ -65,7 +70,7 @@
     
     <route id="begin_dummyService_stage">
       <from uri="direct:begin_dummyService_stage"/>
-      <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service})"/>
+      <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service}, 'stage')"/>
       <to uri="jpa://org.fcrepo.camel.external.storage.model.Job"/>
       <to uri="direct:log_request"/>
     </route>

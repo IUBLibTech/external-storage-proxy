@@ -16,13 +16,14 @@ public class DatabaseService {
     }
     
     public Iterable<Job> findJobsByFile(String external_uri) {
-        return jobs.findByExternalUriStartingWith(external_uri);
+        return jobs.findByExternalUriEquals(external_uri);
     }
     
-    public Job generateJob(String external_uri, String service) {
+    public Job generateJob(String external_uri, String service, String type) {
         Job job = new Job();
         job.setExternalUri(external_uri);
         job.setService(service);
+        job.setType(type);
         job.setStatus("waiting");
         return job;
     }

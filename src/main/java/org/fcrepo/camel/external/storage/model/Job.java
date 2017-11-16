@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -13,7 +14,11 @@ import org.apache.camel.component.jpa.Consumed;
 
 @Entity
 @Table(name = "jobs")
-@NamedQuery(name = "readyJobs", query = "select j from Job j where j.status = 'waiting'")
+@NamedQueries({
+    @NamedQuery(name = "readyJobs", query = "select j from Job j where j.status = 'waiting'"),
+    @NamedQuery(name = "queuedJobs", query = "select j from Job j where j.status = 'queued'")    
+})
+
 public class Job {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -101,6 +106,10 @@ public class Job {
     @Consumed
     public void afterConsume()
     {
-        setStatus("queued");
+        if (this.status.equals("waiting")) {
+            setStatus("queued");
+        } else if (this.status.equals("queued")) {
+            setStatus("pending");
+        }
     }
 }

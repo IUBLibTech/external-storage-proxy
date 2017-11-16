@@ -53,7 +53,7 @@ public class ApplicationTest {
      public void jobQueueProcessorTest() {
         // Wait for the job_queue_processor route to consume/alter the db rows
         try {
-            Thread.sleep(5000);
+            Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -61,10 +61,10 @@ public class ApplicationTest {
             HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
             });
         List<Job> jobs = response.getBody();
-        /* If the Camel JPA route is working, the status of selected rows in the database 
-           will be changed. */
+        /* If the Camel JPA routes are working, the status of selected rows in the database 
+           will eventually be changed from waiting to queued to pending. */
         assertThat(jobs).element(0)
-            .hasFieldOrPropertyWithValue("status", "queued");
+            .hasFieldOrPropertyWithValue("status", "pending");
     }
     
     @Test
@@ -78,6 +78,7 @@ public class ApplicationTest {
         List<Job> jobs = response.getBody();
         assertThat(jobs).hasSize(3);
         assertThat(jobs).element(2)
+            .hasFieldOrPropertyWithValue("type","stage")
             .hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
     }
     
