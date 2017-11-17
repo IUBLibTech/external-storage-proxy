@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class CommonResponse {
 
-    private String external_uri = null;
+    private String externalUri = null;
     private String service = null;
     private HashMap<String, String> stage = null;
     private HashMap<String, String> fixity = null;
     
-    public String getExternal_uri() {
-        return external_uri;
+    public String getExternalUri() {
+        return externalUri;
     }
-    public void setExternal_uri(String external_uri) {
-        this.external_uri = external_uri;
+    public void setExternalUri(String externalUri) {
+        this.externalUri = externalUri;
     }
     public String getService() {
         return service;

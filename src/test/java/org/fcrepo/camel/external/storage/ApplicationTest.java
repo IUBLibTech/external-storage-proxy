@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.fcrepo.camel.external.storage.common.CommonResponse;
 import org.fcrepo.camel.external.storage.model.Job;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -87,11 +88,10 @@ public class ApplicationTest {
     public void statusByFileUriTest() {
         ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
            HttpMethod.POST, null, String.class);
-        ResponseEntity<List<Job>> response = restTemplate.exchange("/dummyService/status/unstagedFile",
-           HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {});
-        List<Job> jobs = response.getBody();
-        assertThat(jobs).hasSize(1);
-        assertThat(jobs).element(0)
-        .hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
+        ResponseEntity<CommonResponse> response = restTemplate.exchange("/dummyService/status/unstagedFile",
+           HttpMethod.GET, null, new ParameterizedTypeReference<CommonResponse>() {});
+        CommonResponse common = response.getBody();
+        assertThat(common).hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
+        assertThat(common).hasFieldOrProperty("stage");
     }
 }

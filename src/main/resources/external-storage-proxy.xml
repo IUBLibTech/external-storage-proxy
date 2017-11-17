@@ -9,6 +9,7 @@
   <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.sda.DefaultProcessor"/>
   <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
   <bean id="database_service" class="org.fcrepo.camel.external.storage.service.DatabaseService"/>
+  <bean id="common_response_processor" class="org.fcrepo.camel.external.storage.common.CommonResponseProcessor"/>
   
   <camelContext id="ExternalStorageProxy" xmlns="http://camel.apache.org/schema/spring">
     <routeBuilder ref="sda_proxy_routes" />
@@ -40,6 +41,7 @@
     <route id="fileUriStatus">
       <from uri="direct:fileUriStatus"/>
       <to uri="bean:database_service?method=findJobsByFile(${header.external_uri})"/>
+      <to uri="bean:common_response_processor"/>
       <to uri="direct:log_request"/>
     </route>
     

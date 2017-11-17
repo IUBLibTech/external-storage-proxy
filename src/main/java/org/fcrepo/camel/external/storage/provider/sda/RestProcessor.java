@@ -91,7 +91,7 @@ public class RestProcessor implements Processor{
 			
 			HashMap<String, String> stage = new HashMap<String, String>();
 		        HashMap<String, String> fixity = new HashMap<String, String>();
-		        common.setExternal_uri(cacheResponse.getName());
+		        common.setExternalUri(cacheResponse.getName());
 		        common.setService("sda");
 		        if (cacheResponse.getStatus() != null) {
 		            stage.put("status", cacheResponse.getStatus());
