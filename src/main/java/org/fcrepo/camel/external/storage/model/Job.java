@@ -16,7 +16,8 @@ import org.apache.camel.component.jpa.Consumed;
 @Table(name = "jobs")
 @NamedQueries({
     @NamedQuery(name = "readyJobs", query = "select j from Job j where j.status = 'waiting'"),
-    @NamedQuery(name = "queuedJobs", query = "select j from Job j where j.status = 'queued'")    
+    @NamedQuery(name = "queuedJobs", query = "select j from Job j where j.status = 'queued' and j.service = :service"),
+    @NamedQuery(name = "pendingJobs", query = "select j from Job j where j.status = 'pending' and j.service = :service")
 })
 
 public class Job {

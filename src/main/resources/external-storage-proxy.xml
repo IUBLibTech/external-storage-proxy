@@ -10,6 +10,7 @@
   <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
   <bean id="database_service" class="org.fcrepo.camel.external.storage.service.DatabaseService"/>
   <bean id="common_response_processor" class="org.fcrepo.camel.external.storage.common.CommonResponseProcessor"/>
+  <bean id="myStringToMapTypeConverter" class="org.fcrepo.camel.external.storage.common.StringToMapTypeConverter"/>
   
   <camelContext id="ExternalStorageProxy" xmlns="http://camel.apache.org/schema/spring">
     <routeBuilder ref="sda_proxy_routes" />
@@ -33,8 +34,21 @@
       <to uri="direct:log_request"/>
     </route>
     
-    <route id="job_queued_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;consumer.delay=5000&amp;consumeDelete=false" />
+    <route id="dummyService_queued_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <to uri="direct:begin_dummyService_runner"/>
+      <to uri="direct:log_request"/>
+    </route>
+    
+    <route id="dummyService_pending_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=pendingJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <to uri="direct:begin_dummyService_runner"/>
+      <to uri="direct:log_request"/>
+    </route>
+    
+    <route id="sda_queued_processor">
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <to uri="direct:begin_dummyService_runner"/>
       <to uri="direct:log_request"/>
     </route>
     
@@ -64,8 +78,6 @@
     <!-- Dummy routes for test suite -->
     <route id="begin_dummyService_status">
       <from uri="direct:begin_dummyService_status"/>
-      <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
-      <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
       <to uri="direct:fileUriStatus"/>
       <to uri="direct:log_request"/>
     </route>
@@ -76,18 +88,26 @@
       <to uri="jpa://org.fcrepo.camel.external.storage.model.Job"/>
       <to uri="direct:log_request"/>
     </route>
+    
+    <route id="begin_dummyService_runner">
+      <from uri="direct:begin_dummyService_runner"/>
+      
+      <to uri="direct:log_request"/>
+    </route>
 
     <route id="begin_sda_status">
       <from uri="direct:begin_sda_status"/>
       <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
       <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
-      <to uri="direct:sdaSearchFile"/>
+      <to uri="direct:fileUriStatus"/>
+      <!--<to uri="direct:sdaSearchFile"/> -->
       <to uri="direct:log_request"/>
     </route>
 
     <route id="begin_sda_stage">
       <from uri="direct:begin_sda_stage"/>
-      <to uri="direct:sdaPostJob"/>
+      <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service}, 'stage')"/>
+      <to uri="jpa://org.fcrepo.camel.external.storage.model.Job"/>
       <to uri="direct:log_request"/>
     </route>
 

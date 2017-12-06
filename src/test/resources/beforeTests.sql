@@ -1,4 +1,4 @@
 INSERT INTO jobs (id, external_uri, service, status, type)
   VALUES
-      (1, 'myFile', 'myService', 'waiting', 'stage'),
-      (2, 'myFile', 'myService', 'waiting', 'fixity');
+      (1, 'myFile', 'dummyService', 'waiting', 'stage'),
+      (2, 'myFile', 'dummyService', 'waiting', 'fixity');
