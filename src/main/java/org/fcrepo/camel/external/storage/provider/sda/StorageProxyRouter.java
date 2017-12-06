@@ -1,23 +1,13 @@
 package org.fcrepo.camel.external.storage.provider.sda;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.PropertyInject;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.Processor;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.model.dataformat.JsonLibrary;
-import org.slf4j.Logger;
-import org.apache.camel.ExchangePattern;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.fcrepo.camel.external.storage.model.Job;
+import org.slf4j.Logger;
 
 
 public class StorageProxyRouter extends RouteBuilder {
@@ -81,12 +71,12 @@ public class StorageProxyRouter extends RouteBuilder {
                   @Override
                   public void process(Exchange exchange) throws Exception{
 
-                         JobBeanParam myBean = new JobBeanParam();
-                         // myBean = exchange.getIn().getBody(JobBeanParam.class);
-                         // String fileId = myBean.getFileId();
-                         String fileId = exchange.getIn().getHeader("external_uri", String.class);
-                         // String type = myBean.getType();
-                         String type = exchange.getIn().getHeader("action", String.class);
+                         Job jobBean = new Job();
+                         jobBean = exchange.getIn().getBody(Job.class);
+                         String fileId = jobBean.getExternalUri();
+                         //String fileId = exchange.getIn().getHeader("external_uri", String.class);
+                         String type = jobBean.getType();
+                         //String type = exchange.getIn().getHeader("action", String.class);
                          exchange.getIn().setBody("{\"cache_file_name\":\""+fileId+"\",\"type\":\""+type+"\"}",String.class);
                          exchange.getIn().setHeader(Exchange.HTTP_PATH, "/" + fileId);
                          exchange.getIn().setHeader(type, String.class);
@@ -94,12 +84,12 @@ public class StorageProxyRouter extends RouteBuilder {
                  })
 		.log("forwarding head... ${header.type}")
 		.log("forwarding body...${body}")
-		.recipientList(simple("direct:sda_${header.action}"));
+		.recipientList(simple("direct:sda_stage"));
 
 		from("direct:sda_stage")
 		.log("forwarding stage head...${headers}")
-		.inOnly("direct:sda_stagenoreturn")
-		.to("direct:sda_joboutput");
+		.inOnly("direct:sda_stagenoreturn");
+		//.to("direct:sda_joboutput");
 
 		from("direct:sda_joboutput")
 		.process(new JobProcessor())
