@@ -5,10 +5,12 @@
        xsi:schemaLocation="
          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+         
   
   <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.sda.DefaultProcessor"/>
   <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
   <bean id="database_service" class="org.fcrepo.camel.external.storage.service.DatabaseService"/>
+  <bean id="sda_job_service" class="org.fcrepo.camel.external.storage.provider.sda.JobService"/>
   <bean id="common_response_processor" class="org.fcrepo.camel.external.storage.common.CommonResponseProcessor"/>
   <bean id="myStringToMapTypeConverter" class="org.fcrepo.camel.external.storage.common.StringToMapTypeConverter"/>
   
@@ -47,8 +49,9 @@
     </route>
     
     <route id="sda_queued_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
-      <to uri="direct:begin_dummyService_runner"/>
+      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false&amp;consumeLockEntity=false" />
+      <log message="Processed jobs database with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
+      <to uri="direct:begin_sdaService_runner"/>
       <to uri="direct:log_request"/>
     </route>
     
@@ -91,7 +94,21 @@
     
     <route id="begin_dummyService_runner">
       <from uri="direct:begin_dummyService_runner"/>
-      
+      <to uri="direct:log_request"/>
+    </route>
+    
+    <route id="begin_sdaService_runner">
+      <from uri="direct:begin_sdaService_runner"/>
+      <log message="Posting SDA job with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
+      <to uri="direct:sdaPostJob"/>
+      <to uri="direct:log_request"/>
+    </route>
+    
+    <route id="sda_pending_processor">
+      <from uri="timer://sda_timer?fixedRate=true&amp;period=5s"/>
+      <log message="Processing ${body.size} pending jobs service for SDA Service"/>
+      <to uri="bean:database_service?method=findPendingJobsByService(sda)"/>
+      <to uri="bean:sda_job_service"/>
       <to uri="direct:log_request"/>
     </route>
 
@@ -100,7 +117,7 @@
       <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
       <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
       <to uri="direct:fileUriStatus"/>
-      <!--<to uri="direct:sdaSearchFile"/> -->
+      <!-- <to uri="direct:sdaSearchFile"/> --> 
       <to uri="direct:log_request"/>
     </route>
 

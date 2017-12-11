@@ -35,7 +35,8 @@ public class StorageProxyRouter extends RouteBuilder {
 			}
 		})
 		.log("multicast==========")
-		.log("Headers Java DSL: ${headers}")
+		.to("direct:log_request")
+		//.log("Headers Java DSL: ${headers}")
 		.to("direct:sdaGetCache", "direct:sdaGetChecksum")
 		.end()
 		.log("searchFile done****${body}*******")
@@ -44,7 +45,9 @@ public class StorageProxyRouter extends RouteBuilder {
 
 		from("direct:sdaGetCache")
 		.process("{{sda_processor_bean}}")
-                .to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false")
+		.setHeader(Exchange.HTTP_METHOD, constant("GET"))
+		.to("direct:log_request")
+		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false")
 		.log("get cache body...${body}...done");
 
 		from("direct:sdaGetChecksum")
@@ -96,12 +99,12 @@ public class StorageProxyRouter extends RouteBuilder {
 		.log("return response...done");
 
 		from("direct:sda_stagenoreturn")
-		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false&httpMethodRestrict=POST")
+		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&throwExceptionOnFailure=true&httpMethodRestrict=POST")
 		.log("finish stage!!!");
 
 		from("direct:sda_unstage")
 		.setHeader(Exchange.HTTP_METHOD, constant("DELETE"))
-		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false&httpMethodRestrict=DELETE")
+		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&throwExceptionOnFailure=false&httpMethodRestrict=DELETE")
 		.to("direct:sda_joboutput");
 
 		from("direct:sda_fixity")

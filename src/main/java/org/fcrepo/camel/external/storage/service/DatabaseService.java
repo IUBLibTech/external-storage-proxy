@@ -19,6 +19,10 @@ public class DatabaseService {
         return jobs.findByExternalUriEquals(external_uri);
     }
     
+    public Iterable<Job> findPendingJobsByService(String service) {
+        return jobs.findByServiceAndStatusEquals(service, "pending");
+    }
+            
     public Job generateJob(String external_uri, String service, String type) {
         Job job = new Job();
         job.setExternalUri(external_uri);

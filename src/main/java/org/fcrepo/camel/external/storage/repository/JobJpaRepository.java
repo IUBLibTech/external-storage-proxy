@@ -7,4 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface JobJpaRepository extends CrudRepository<Job, Integer> {
     List<Job> findByExternalUriEquals(String external_uri);
+    List<Job> findByServiceAndStatusEquals(String external_uri, String status);
 }

@@ -32,11 +32,13 @@ public class CommonResponseProcessor implements Processor {
                 if (job.getType().equals("stage")) {
                     stage.put("status", job.getStatus());
                     stage.put("result", job.getResult());
+                    stage.put("vendor_message", job.getVendorMsg());
                     common.setStage(stage);
                 }
                 if (job.getType().equals("fixity")) {
                     stage.put("status", job.getStatus());
                     stage.put("result", job.getResult());
+                    stage.put("vendor_message", job.getVendorMsg());
                     common.setFixity(fixity);
                 }
             }
