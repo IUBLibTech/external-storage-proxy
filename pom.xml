@@ -48,6 +48,11 @@
 		</dependency>
 		<dependency>
 		  <groupId>org.apache.camel</groupId>
+		  <artifactId>camel-velocity</artifactId>
+		  <version>${camel.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.camel</groupId>
 		  <artifactId>camel-jackson</artifactId>
 		  <version>${camel.version}</version>
 		</dependency>
@@ -78,6 +83,26 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+          <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+            <exclusions>
+              <exclusion>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-websockets-jsr</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+		<!-- hawtio -->
+        <dependency>
+           <groupId>io.hawt</groupId>
+           <artifactId>hawtio-springboot</artifactId>
+           <version>1.5.5</version>
+        </dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>

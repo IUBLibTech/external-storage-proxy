@@ -15,10 +15,19 @@ public class DatabaseService {
         return jobs.findAll();
     }
     
-    public Job generateJob(String file_uri, String service) {
+    public Iterable<Job> findJobsByFile(String external_uri) {
+        return jobs.findByExternalUriEquals(external_uri);
+    }
+    
+    public Iterable<Job> findPendingJobsByService(String service) {
+        return jobs.findByServiceAndStatusEquals(service, "pending");
+    }
+            
+    public Job generateJob(String external_uri, String service, String type) {
         Job job = new Job();
-        job.setExternal_uri(file_uri);
+        job.setExternalUri(external_uri);
         job.setService(service);
+        job.setType(type);
         job.setStatus("waiting");
         return job;
     }

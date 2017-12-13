@@ -24,7 +24,7 @@ public class JobProcessor implements Processor{
 		jobResponse.setFileName(in.getHeader("external_uri", String.class));
 		jobResponse.setType(in.getHeader("action", String.class));
 		
-                common.setExternal_uri(jobResponse.getFileName());
+                common.setExternalUri(jobResponse.getFileName());
                 common.setService(jobResponse.getCacheName());
                 if (jobResponse.getType().equals("stage")) {
                     HashMap<String, String> stage = new HashMap<String, String>();

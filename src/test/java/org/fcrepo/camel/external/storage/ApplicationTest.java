@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.fcrepo.camel.external.storage.common.CommonResponse;
 import org.fcrepo.camel.external.storage.model.Job;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,10 +42,10 @@ public class ApplicationTest {
         List<Job> jobs = response.getBody();
         assertThat(jobs).hasSize(2);
         assertThat(jobs).element(0)
-            .hasFieldOrPropertyWithValue("external_uri", "myFile")
+            .hasFieldOrPropertyWithValue("externalUri", "myFile")
             .hasFieldOrPropertyWithValue("type", "stage");
         assertThat(jobs).element(1)
-            .hasFieldOrPropertyWithValue("external_uri", "myFile")
+            .hasFieldOrPropertyWithValue("externalUri", "myFile")
             .hasFieldOrPropertyWithValue("type","fixity");
     }
     
@@ -53,7 +54,7 @@ public class ApplicationTest {
      public void jobQueueProcessorTest() {
         // Wait for the job_queue_processor route to consume/alter the db rows
         try {
-            Thread.sleep(5000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -61,10 +62,10 @@ public class ApplicationTest {
             HttpMethod.GET, null, new ParameterizedTypeReference<List<Job>>() {
             });
         List<Job> jobs = response.getBody();
-        /* If the Camel JPA route is working, the status of selected rows in the database 
-           will be changed. */
+        /* If the Camel JPA routes are working, the status of selected rows in the database 
+           will eventually be changed from waiting to queued to pending. */
         assertThat(jobs).element(0)
-            .hasFieldOrPropertyWithValue("status", "queued");
+            .hasFieldOrPropertyWithValue("status", "pending");
     }
     
     @Test
@@ -78,6 +79,19 @@ public class ApplicationTest {
         List<Job> jobs = response.getBody();
         assertThat(jobs).hasSize(3);
         assertThat(jobs).element(2)
-            .hasFieldOrPropertyWithValue("external_uri", "unstagedFile");
+            .hasFieldOrPropertyWithValue("type","stage")
+            .hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
+    }
+    
+    @Test
+    //@Ignore
+    public void statusByFileUriTest() {
+        ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
+           HttpMethod.POST, null, String.class);
+        ResponseEntity<CommonResponse> response = restTemplate.exchange("/dummyService/status/unstagedFile",
+           HttpMethod.GET, null, new ParameterizedTypeReference<CommonResponse>() {});
+        CommonResponse common = response.getBody();
+        assertThat(common).hasFieldOrPropertyWithValue("externalUri", "unstagedFile");
+        assertThat(common).hasFieldOrProperty("stage");
     }
 }
