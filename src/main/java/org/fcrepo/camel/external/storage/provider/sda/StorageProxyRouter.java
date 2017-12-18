@@ -84,10 +84,8 @@ public class StorageProxyRouter extends RouteBuilder {
 		from("direct:sda_stage")
 		.log("forwarding stage head...${headers}")
 		.inOnly("direct:sda_stagenoreturn");
-		//.to("direct:sda_joboutput");
 
 		from("direct:sda_joboutput")
-		.process(new JobProcessor())
 		.log("return response...done");
 
 		from("direct:sda_stagenoreturn")
@@ -96,14 +94,12 @@ public class StorageProxyRouter extends RouteBuilder {
 
 		from("direct:sda_unstage")
 		.setHeader(Exchange.HTTP_METHOD, constant("DELETE"))
-		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&throwExceptionOnFailure=false&httpMethodRestrict=DELETE")
-		.to("direct:sda_joboutput");
+		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_servicename}}?bridgeEndpoint=true&throwExceptionOnFailure=false&httpMethodRestrict=DELETE");
 
 		from("direct:sda_fixity")
 		.log("fixity header ... ${headers}")
 		.wireTap("direct:sda_stagenoreturn")
-		.wireTap("direct:sda_checksum")
-		.to("direct:sda_joboutput");
+		.wireTap("direct:sda_checksum");
 
 		from("direct:sda_checksum")
 		.to("jetty:http://{{sda_hostname}}:{{sda_port}}/{{sda_fixityservice}}?bridgeEndpoint=true&amp;throwExceptionOnFailure=false&httpMethodRestrict=POST")
