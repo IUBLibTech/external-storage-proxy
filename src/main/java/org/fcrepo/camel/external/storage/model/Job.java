@@ -24,10 +24,8 @@ public class Job {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-
-    private String fname;  // TODO Why do we need this field from whiteboard sketches?
-    private String resourceUri; // The resource uri for fname in a repository like Fedora
-    private String externalUri; // The uri to the fname in the storage service
+    private String resourceUri; // The resource uri for a file representation in a repository like Fedora
+    private String externalUri; // The uri to a file in the storage service provider
     private String service;
     private String status;
     private Date createdAt;
@@ -38,13 +36,6 @@ public class Job {
     
     public Long getId() {
         return id;
-    }
-    
-    public String getFname() {
-        return fname;
-    }
-    public void setFname(String fname) {
-        this.fname = fname;
     }
     public String getResourceUri() {
         return resourceUri;

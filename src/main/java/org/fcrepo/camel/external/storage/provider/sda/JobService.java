@@ -29,7 +29,9 @@ public class JobService implements Processor {
         List<Job> sda_jobs = exchange.getIn().getBody(List.class);
         if (sda_jobs != null && !sda_jobs.isEmpty()){
             for (Job job : sda_jobs) {
-                String result = template.requestBodyAndHeader("direct:sdaGetCache", "mybody", "external_uri", job.getExternalUri(), String.class);
+                // TODO Have to conditionally handle fixity
+                String result = template.requestBodyAndHeader("direct:sdaGetCache", "mybody", "external_uri", 
+                                                              job.getExternalUri(), String.class);
                 
                 Map<String, Object> map = objectMapper.readValue(result, new TypeReference<Map<String,Object>>(){});
                 
@@ -52,14 +54,13 @@ public class JobService implements Processor {
         }
         
         template.stop();
-        // Job finalResponse = updateJob(jobBean);
-        // exchange.getOut().setBody(finalResponse);
     }
     
 
-    
-    public Job updateJob(Job job) {
-        job.setStatus("complete");
+    // TODO Conditional logic to handle either stage or fixity could be handled in a method
+    public Job updateJob(Job job, String action, String result) {
+        job.setStatus("success");
+        job.setResult(result);
         return job;
     }
 }

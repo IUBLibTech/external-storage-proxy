@@ -1,20 +1,12 @@
 package org.fcrepo.camel.external.storage.provider.sda;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.fcrepo.camel.external.storage.model.Job;
-import org.slf4j.Logger;
-
 
 public class StorageProxyRouter extends RouteBuilder {
-
-	private static final Logger LOGGER = getLogger(StorageProxyRouter.class);
-	//private String fileId;
-	//private String restEndpoint;
 
 	public void configure() throws Exception {
 
@@ -87,7 +79,7 @@ public class StorageProxyRouter extends RouteBuilder {
                  })
 		.log("forwarding head... ${header.type}")
 		.log("forwarding body...${body}")
-		.recipientList(simple("direct:sda_stage"));
+		.recipientList(simple("direct:sda_stage")); // TODO this has to conditionally handle fixity as an action
 
 		from("direct:sda_stage")
 		.log("forwarding stage head...${headers}")

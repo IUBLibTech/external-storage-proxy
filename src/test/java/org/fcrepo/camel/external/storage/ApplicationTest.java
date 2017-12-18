@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.fcrepo.camel.external.storage.common.CommonResponse;
 import org.fcrepo.camel.external.storage.model.Job;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,6 @@ public class ApplicationTest {
     }
     
     @Test
-    // @Ignore
      public void jobQueueProcessorTest() {
         // Wait for the job_queue_processor route to consume/alter the db rows
         try {
@@ -69,7 +67,6 @@ public class ApplicationTest {
     }
     
     @Test
-    // @Ignore
     public void postJobTest() {
         ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
             HttpMethod.POST, null, String.class);
@@ -84,7 +81,6 @@ public class ApplicationTest {
     }
     
     @Test
-    //@Ignore
     public void statusByFileUriTest() {
         ResponseEntity<String> stageResponse = restTemplate.exchange("/dummyService/stage/unstagedFile",
            HttpMethod.POST, null, String.class);
