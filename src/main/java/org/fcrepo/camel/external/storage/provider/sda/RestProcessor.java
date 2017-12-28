@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.fcrepo.camel.external.storage.common.CommonResponse;
-
-import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +17,6 @@ public class RestProcessor implements Processor{
 	//@Override	
 	public void process(final Exchange exchange) throws Exception {
 		final Message in = exchange.getIn();
-		final String contentType = in.getHeader(Exchange.CONTENT_TYPE, "", String.class);
 		final String body = in.getBody(String.class);
 		CacheResponse cacheResponse = new CacheResponse();
 		ObjectMapper mapper = new ObjectMapper();

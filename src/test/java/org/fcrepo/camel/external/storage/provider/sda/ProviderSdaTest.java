@@ -31,7 +31,6 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-//@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sdaBeforeTests.sql")
 @Sql(executionPhase = ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:afterTests.sql")
 
 // To skip any failing test methods, annotate them with @Ignore 
@@ -40,8 +39,9 @@ public class ProviderSdaTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-    private RestTemplate remoteRestTemplate = new RestTemplate();
+    
     // TODO Figure out how to use the following to mock SDA calls
+    // private RestTemplate remoteRestTemplate = new RestTemplate();
     // private MockRestServiceServer server = MockRestServiceServer.bindTo(remoteRestTemplate).build();
 
     
@@ -52,7 +52,7 @@ public class ProviderSdaTest {
     
     
     @Test
-    // @Ignore
+    @Ignore
     public void sdaJobStatusTest() {
         ResponseEntity<String> stageResponse = restTemplate.exchange("/sda/stage/foo",
                                                                     HttpMethod.POST, null, String.class);
