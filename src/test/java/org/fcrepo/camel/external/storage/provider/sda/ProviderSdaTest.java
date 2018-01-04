@@ -60,7 +60,7 @@ public class ProviderSdaTest {
         // Wait for the job_queue_processor route to consume/alter the db rows
         // assertThat(stageResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         try {
-            Thread.sleep(8000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

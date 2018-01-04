@@ -52,7 +52,7 @@ public class ApplicationTest {
      public void jobQueueProcessorTest() {
         // Wait for the job_queue_processor route to consume/alter the db rows
         try {
-            Thread.sleep(20000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
