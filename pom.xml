@@ -119,6 +119,13 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-actuator</artifactId>
         </dependency>
+        <dependency>
+           <groupId>com.github.tomakehurst</groupId>
+           <artifactId>wiremock</artifactId>
+           <version>1.58</version>
+           <scope>test</scope>
+        </dependency>
+        
 		<!-- hawtio -->
         <dependency>
            <groupId>io.hawt</groupId>
