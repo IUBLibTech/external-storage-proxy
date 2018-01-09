@@ -23,7 +23,7 @@ import org.apache.camel.component.jpa.Consumed;
 public class Job {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+    private int id;
     private String resourceUri; // The resource uri for a file representation in a repository like Fedora
     private String externalUri; // The uri to a file in the storage service provider
     private String service;
@@ -34,7 +34,7 @@ public class Job {
     private String type;
     private String vendorMsg;
     
-    public Long getId() {
+    public int getId() {
         return id;
     }
     public String getResourceUri() {
