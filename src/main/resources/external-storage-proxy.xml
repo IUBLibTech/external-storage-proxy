@@ -14,10 +14,19 @@
   <bean id="common_response_processor" class="org.fcrepo.camel.external.storage.common.CommonResponseProcessor"/>
   <bean id="myStringToMapTypeConverter" class="org.fcrepo.camel.external.storage.common.StringToMapTypeConverter"/>
   
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   <camelContext id="ExternalStorageProxy" xmlns="http://camel.apache.org/schema/spring">
+    
     
     <!-- Route builder references for custom storage provider plugins   -->
     <routeBuilder ref="sda_proxy_routes" />
+    
+    <!-- These endpoint defs allow property placeholders within URIs -->
+    <endpoint id="job_ready_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay={{job_ready_period}}&amp;consumeDelete=false" />
+    <endpoint id="dummy_queued_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay={{dummy_queued_proc_period}}&amp;consumeDelete=false"/>
+    <endpoint id="dummy_pending_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=pendingJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay={{dummy_pending_proc_period}}&amp;consumeDelete=false" />
+    <endpoint id="sda_queued_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay={{sda_queued_proc_period}}&amp;consumeDelete=false&amp;consumeLockEntity=false" />
+    <endpoint id="sda_timer" uri="timer://sda_timer?fixedRate=true&amp;period={{sda_timer_period}}"/>
     
     <!-- Core endpoints using Camel REST DSL -->
     <rest path="/">
@@ -35,6 +44,7 @@
     </rest>
 
     <!-- Core routes for creating and processing job requests -->
+    
     <route id="externalUriStatus">
       <from uri="direct:externalUriStatus"/>
       <to uri="bean:database_service?method=findJobsByFile(${header.external_uri})"/>
@@ -43,7 +53,7 @@
     </route>
     
     <route id="job_ready_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <from uri="ref:job_ready_proc" />
       <to uri="direct:log_request"/>
     </route>
     
@@ -86,13 +96,13 @@
     </route>
     
     <route id="dummyService_queued_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <from uri="ref:dummy_queued_proc" />
       <to uri="direct:begin_dummyService_runner"/>
       <to uri="direct:log_request"/>
     </route>
     
     <route id="dummyService_pending_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=pendingJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false" />
+      <from uri="ref:dummy_pending_proc" />
       <to uri="direct:begin_dummyService_runner"/>
       <to uri="direct:log_request"/>
     </route>
@@ -103,10 +113,7 @@
     <!-- Routes for SDA provider plugin  -->
     <route id="begin_sda_status">
       <from uri="direct:begin_sda_status"/>
-      <!--<setHeader headerName="fileId"><simple>${header.external_uri}</simple></setHeader>-->
-      <!--<setHeader headerName="cacheId"><constant>SDADisk</constant></setHeader>-->
       <to uri="direct:externalUriStatus"/>
-      <!-- <to uri="direct:sdaSearchFile"/> --> 
       <to uri="direct:log_request"/>
     </route>
 
@@ -118,7 +125,7 @@
     </route>
     
     <route id="sda_queued_processor">
-      <from uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay=5000&amp;consumeDelete=false&amp;consumeLockEntity=false" />
+      <from uri="ref:sda_queued_proc" />
       <log message="Processed jobs database with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
       <to uri="direct:begin_sdaService_runner"/>
       <to uri="direct:log_request"/>
@@ -132,7 +139,7 @@
     </route>
     
     <route id="sda_pending_processor">
-      <from uri="timer://sda_timer?fixedRate=true&amp;period=5s"/>
+      <from uri="ref:sda_timer"/>
       <log message="Processing ${body.size} pending jobs service for SDA Service"/>
       <to uri="bean:database_service?method=findPendingJobsByService(sda)"/>
       <to uri="bean:sda_job_service"/>
