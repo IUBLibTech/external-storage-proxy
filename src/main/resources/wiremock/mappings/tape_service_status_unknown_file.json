@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/tapeArchiveService/cache/unknown_file.mp4"
+    },
+    "response": {
+        "status": 200,
+        "body": "{\n \"error\":-3,\"message\":\"not a valid file\"\n}",
+        "headers" : {
+          "Content-Type" : "application/json"
+        }
+    }
+}

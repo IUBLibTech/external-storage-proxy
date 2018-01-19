@@ -7,10 +7,10 @@
          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
          
   
-  <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.sda.DefaultProcessor"/>
-  <bean id="sda_proxy_routes" class="org.fcrepo.camel.external.storage.provider.sda.StorageProxyRouter"/>
+  <bean id="defaultProcessor" class="org.fcrepo.camel.external.storage.provider.tapeArchive.DefaultProcessor"/>
+  <bean id="tapeArchive_proxy_routes" class="org.fcrepo.camel.external.storage.provider.tapeArchive.StorageProxyRouter"/>
   <bean id="database_service" class="org.fcrepo.camel.external.storage.service.DatabaseService"/>
-  <bean id="sda_job_service" class="org.fcrepo.camel.external.storage.provider.sda.JobService"/>
+  <bean id="tapeArchive_job_service" class="org.fcrepo.camel.external.storage.provider.tapeArchive.JobService"/>
   <bean id="common_response_processor" class="org.fcrepo.camel.external.storage.common.CommonResponseProcessor"/>
   <bean id="myStringToMapTypeConverter" class="org.fcrepo.camel.external.storage.common.StringToMapTypeConverter"/>
   
@@ -19,14 +19,14 @@
     
     
     <!-- Route builder references for custom storage provider plugins   -->
-    <routeBuilder ref="sda_proxy_routes" />
+    <routeBuilder ref="tapeArchive_proxy_routes" />
     
     <!-- These endpoint defs allow property placeholders within URIs -->
     <endpoint id="job_ready_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=readyJobs&amp;consumer.delay={{job_ready_period}}&amp;consumeDelete=false" />
     <endpoint id="dummy_queued_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay={{dummy_queued_proc_period}}&amp;consumeDelete=false"/>
     <endpoint id="dummy_pending_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=pendingJobs&amp;parameters={&quot;service&quot;:&quot;dummyService&quot;}&amp;consumer.delay={{dummy_pending_proc_period}}&amp;consumeDelete=false" />
-    <endpoint id="sda_queued_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;sda&quot;}&amp;consumer.delay={{sda_queued_proc_period}}&amp;consumeDelete=false&amp;consumeLockEntity=false" />
-    <endpoint id="sda_timer" uri="timer://sda_timer?fixedRate=true&amp;period={{sda_timer_period}}"/>
+    <endpoint id="tapeArchive_queued_proc" uri="jpa://org.fcrepo.camel.external.storage.model.Job?consumer.namedQuery=queuedJobs&amp;parameters={&quot;service&quot;:&quot;tapeArchive&quot;}&amp;consumer.delay={{tapeArchive_queued_proc_period}}&amp;consumeDelete=false&amp;consumeLockEntity=false" />
+    <endpoint id="tapeArchive_timer" uri="timer://tapeArchive_timer?fixedRate=true&amp;period={{tapeArchive_timer_period}}"/>
     
     <!-- Core endpoints using Camel REST DSL -->
     <rest path="/">
@@ -110,39 +110,39 @@
     
     <!-- Routes for custom storage provider plugins   -->
 
-    <!-- Routes for SDA provider plugin  -->
-    <route id="begin_sda_status">
-      <from uri="direct:begin_sda_status"/>
+    <!-- Routes for tapeArchive provider plugin  -->
+    <route id="begin_tapeArchive_status">
+      <from uri="direct:begin_tapeArchive_status"/>
       <to uri="direct:externalUriStatus"/>
       <to uri="direct:log_request"/>
     </route>
 
-    <route id="begin_sda_stage">
-      <from uri="direct:begin_sda_stage"/>
+    <route id="begin_tapeArchive_stage">
+      <from uri="direct:begin_tapeArchive_stage"/>
       <to uri="bean:database_service?method=generateJob(${header.external_uri}, ${header.service}, 'stage')"/>
       <to uri="jpa://org.fcrepo.camel.external.storage.model.Job"/>
       <to uri="direct:log_request"/>
     </route>
     
-    <route id="sda_queued_processor">
-      <from uri="ref:sda_queued_proc" />
+    <route id="tapeArchive_queued_processor">
+      <from uri="ref:tapeArchive_queued_proc" />
       <log message="Processed jobs database with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
-      <to uri="direct:begin_sdaService_runner"/>
+      <to uri="direct:begin_tapeArchiveService_runner"/>
       <to uri="direct:log_request"/>
     </route>
     
-    <route id="begin_sdaService_runner">
-      <from uri="direct:begin_sdaService_runner"/>
-      <log message="Posting SDA job with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
-      <to uri="direct:sdaPostJob"/>
+    <route id="begin_tapeArchiveService_runner">
+      <from uri="direct:begin_tapeArchiveService_runner"/>
+      <log message="Posting tapeArchive job with job #id ${body.id} for ${body.externalUri} with ${body.status}"/>
+      <to uri="direct:tapeArchivePostJob"/>
       <to uri="direct:log_request"/>
     </route>
     
-    <route id="sda_pending_processor">
-      <from uri="ref:sda_timer"/>
-      <log message="Processing ${body.size} pending jobs service for SDA Service"/>
-      <to uri="bean:database_service?method=findPendingJobsByService(sda)"/>
-      <to uri="bean:sda_job_service"/>
+    <route id="tapeArchive_pending_processor">
+      <from uri="ref:tapeArchive_timer"/>
+      <log message="Processing ${body.size} pending jobs service for tapeArchive Service"/>
+      <to uri="bean:database_service?method=findPendingJobsByService(tapeArchive)"/>
+      <to uri="bean:tapeArchive_job_service"/>
       <to uri="direct:log_request"/>
     </route>
 

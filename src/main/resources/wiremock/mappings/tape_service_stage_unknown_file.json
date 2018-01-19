@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/tapeArchiveService/cache/unknown_file.mp4"
+    },
+    "response": {
+        "status": 200,
+        "body": "{\n \"error\":0,\"message\":\"request accepted\"\n}",
+        "headers" : {
+          "Content-Type" : "application/json"
+        }
+    }
+}

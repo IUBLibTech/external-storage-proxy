@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/tapeArchiveService/cache/unstaged_file_01_access.mp4"
+    },
+    "response": {
+        "status": 200,
+        "body": "{\n \"url\":\"pending\", \"error\":1,\"message\":\"stage of file is pending\"\n}",
+        "headers" : {
+          "Content-Type" : "application/json"
+        }
+    }
+}

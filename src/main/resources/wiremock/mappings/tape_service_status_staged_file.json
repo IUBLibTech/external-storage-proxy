@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/tapeArchiveService/cache/staged_file_01_access.mp4"
+    },
+    "response": {
+        "status": 200,
+        "body": "{\n \"url\":\"/download_cache/staged_file_01_access.mp4\",\"error\":0,\"message\":\"file is present\"\n}",
+        "headers" : {
+          "Content-Type" : "application/json"
+        }
+    }
+}
